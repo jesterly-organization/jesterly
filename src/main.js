@@ -1,11 +1,18 @@
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import { Client } from "discord.js";
 import { loadEnvFromFolder } from "jsonforenv";
-await loadEnvFromFolder("./src/configs/");
+import { loadCommands, loadEvents } from "./loaders/index.js";
+import "dotenv/config";
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+(async () => {
+  await loadEnvFromFolder("./src/configs/");
 
-client.once(Events.ClientReady, (c) => {
-  console.log(`Ready! Logged in as ${c.user.tag}`);
-});
+  // create the client
+  const client = new Client({ intents: process.env.intents });
 
-client.login(process.env.tokenBot);
+  await loadCommands(client);
+  await loadEvents(client);
+
+  // login to the bot
+  client.login(process.env.tokenBot);
+  console.log("[INDEX] - index successfully loaded");
+})();
